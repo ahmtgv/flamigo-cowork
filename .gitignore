@@ -1,0 +1,27 @@
+# Зависимости и сборки
+node_modules/
+dist/
+build/
+*.tsbuildinfo
+vite.config.ts.timestamp-*
+
+# Тестовые артефакты
+test-results/
+playwright-report/
+blob-report/
+**/tests/.auth/
+
+# Секреты и локальные env
+.env
+.env.local
+*.local
+!.env.example
+!.env.demo.example
+
+# ОС/редактор
+.DS_Store
+.idea/
+.vscode/
+
+# Временные файлы Office (если вдруг)
+~$*

@@ -1,0 +1,15 @@
+# SEduM на мобильном — БЕЗ реальной камеры.
+# Фикстура подставляется через seam FrameSource (см. mobile-reference/).
+# Именно это делает тест возможным на iOS Simulator, где камеры нет.
+appId: com.flamingo.app
+---
+- launchApp:
+    arguments:
+      frame_source: "fixture_looking_away"   # ← seam
+- tapOn:
+    id: "start-lesson-button"
+- assertVisible:
+    id: "sedum-session"
+- assertVisible:
+    id: "privacy-indicator"        # индикатор камеры обязан быть виден всегда
+- assertVisible: "Отвлечён"        # дискретное состояние, не float

@@ -1,0 +1,89 @@
+name: tests
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+env:
+  BASE_URL: ${{ secrets.STAGE_BASE_URL }}
+  BACKEND_ORIGIN: ${{ secrets.STAGE_BACKEND_ORIGIN }}
+  TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
+  STUDENT_1_ID: ${{ secrets.STUDENT_1_ID }}
+  STUDENT_2_ID: ${{ secrets.STUDENT_2_ID }}
+
+jobs:
+  # ⭐ БЛОКИРУЮЩИЙ ГЕЙТ. Не ослаблять, не делать continue-on-error.
+  # Отчёт сохраняется как комплаенс-артефакт под 152-ФЗ.
+  privacy-gate:
+    name: "⭐ Privacy gate (152-ФЗ)"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { lfs: true }
+      - uses: actions/setup-node@v4
+        with: { node-version: 20, cache: npm }
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run fixtures
+      - run: npx playwright test --project=privacy-gate
+      - name: Сохранить комплаенс-артефакт
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: privacy-compliance-${{ github.sha }}
+          path: playwright-report/
+          retention-days: 365
+
+  permissions:
+    name: "Права доступа / IDOR"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20, cache: npm }
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npx playwright test --project=permissions
+
+  e2e:
+    name: "E2E (веб)"
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [student, teacher, sedum-chromium]
+    steps:
+      - uses: actions/checkout@v4
+        with: { lfs: true }
+      - uses: actions/setup-node@v4
+        with: { node-version: 20, cache: npm }
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run fixtures
+      - run: npx playwright test --project=${{ matrix.project }}
+      - if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: traces-${{ matrix.project }}
+          path: test-results/
+
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20, cache: npm }
+      - run: npm ci
+      - run: npm run typecheck
+
+  api-contract:
+    name: "Контракт публичного API"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - run: bash tests/api/run-contract-tests.sh
+        env:
+          SCHEMA_URL: ${{ secrets.OPENAPI_SCHEMA_URL }}

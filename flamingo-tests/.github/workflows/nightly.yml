@@ -1,0 +1,30 @@
+name: nightly
+
+on:
+  schedule: [{ cron: '0 1 * * *' }]
+  workflow_dispatch:
+
+jobs:
+  a11y:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20, cache: npm }
+      - run: npm ci && npx playwright install --with-deps chromium
+      - run: npx playwright test --project=a11y
+
+  load:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: grafana/setup-k6-action@v1
+      - run: k6 run -e BASE_URL=${{ secrets.STAGE_BASE_URL }} tests/load/exam-spike.js
+      - run: k6 run -e BASE_URL=${{ secrets.STAGE_BASE_URL }} tests/load/sedum-ingest.js
+
+  # Реальные устройства — ночью, не на каждый PR (дорого и медленно).
+  # ⚠️ ПЕРЕД ПОДКЛЮЧЕНИЕМ: убедитесь на триале, что video injection
+  # перехватывает AVCaptureVideoDataOutput, а не только AVCapturePhoto.
+  # real-devices:
+  #   runs-on: ubuntu-latest
+  #   steps: ...

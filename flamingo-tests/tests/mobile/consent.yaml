@@ -1,0 +1,15 @@
+# Согласие законного представителя — блокер запуска SEduM.
+appId: com.flamingo.app
+---
+- launchApp:
+    clearState: true
+    arguments:
+      frame_source: "fixture_attentive"
+- tapOn:
+    id: "start-lesson-button"
+- assertVisible:
+    id: "consent-dialog"
+- tapOn:
+    id: "consent-decline-button"
+- assertNotVisible:
+    id: "sedum-session"

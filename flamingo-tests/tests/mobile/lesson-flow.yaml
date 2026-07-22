@@ -1,0 +1,21 @@
+# Основной путь ученика на мобильном.
+# Запуск: maestro test tests/mobile/lesson-flow.yaml
+appId: com.flamingo.app
+---
+- launchApp:
+    clearState: true
+- tapOn: "Войти"
+- inputText: "student_1"
+- tapOn:
+    id: "password-input"
+- inputText: "${MAESTRO_TEST_PASSWORD}"
+- tapOn: "Продолжить"
+- assertVisible:
+    id: "user-menu"
+- tapOn:
+    id: "course-card"
+- tapOn: "Записаться"
+- tapOn:
+    id: "start-lesson-button"
+- assertVisible:
+    id: "lesson-player"

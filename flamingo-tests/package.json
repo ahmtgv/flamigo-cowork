@@ -1,0 +1,25 @@
+{
+  "name": "flamingo-tests",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Автотесты Flamingo: web E2E, SEduM, privacy-gate, права доступа, нагрузка",
+  "scripts": {
+    "test": "playwright test",
+    "test:fast": "playwright test --grep-invert @slow",
+    "test:privacy": "playwright test --grep @privacy",
+    "test:sedum": "playwright test --project=sedum-chromium",
+    "test:perms": "playwright test tests/web/permissions-idor.spec.ts",
+    "test:a11y": "playwright test tests/web/a11y.spec.ts",
+    "test:flake": "playwright test --repeat-each=20 --grep-invert @slow",
+    "typecheck": "tsc --noEmit",
+    "fixtures": "bash scripts/make-fixtures.sh",
+    "report": "playwright show-report",
+    "test:demo": "playwright test --project=student --project=teacher --project=tablet-landscape --project=foldable-folded --project=foldable-unfolded --project=a11y --project=sedum-attentive --project=sedum-away"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.47.0",
+    "@axe-core/playwright": "^4.10.0",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.6.0"
+  }
+}
