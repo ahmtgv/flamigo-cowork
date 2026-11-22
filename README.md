@@ -1,5 +1,7 @@
 # Flamingo — прототип и автотесты (июль 2026)
 
+> Проект [WHITE OBSERVATORY](https://whiteobservatory.com).
+
 > **Архив.** Здесь лежит внешняя работа над Flamingo летом 2026 года: кликабельный прототип,
 > набор автотестов и R&D-отчёт SEduM. Действующий продукт — репозиторий
 > [ahmtgv/flamingo](https://github.com/ahmtgv/flamingo) (сайт https://flamingo.plus).
